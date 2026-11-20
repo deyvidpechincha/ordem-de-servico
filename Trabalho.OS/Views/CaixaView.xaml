@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="Trabalho.OS.Views.CaixaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text=" Caixa " Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+
+        <!-- caixa-lançamento -->
+        <Grid Grid.Row ="1" Margin ="0,0,0,15" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition  Width="*"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width ="100"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                <TextBlock Text="Descrição" Foreground="#ADB5BD" Margin="0,0,0,4"/>
+                <TextBox x:Name="TxtDesc" Height="35" Padding="5" Background="#2B3035" Foreground="White" BorderBrush="#495057"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Margin="0,0,8,0">
+                <TextBlock Text="Valor (R$)" Foreground="#ADB5BD" Margin="0,0,0,4"/>
+                <TextBox x:Name="TxtValor" Height="35" Padding="5" Background="#2B3035" Foreground="White" BorderBrush="#495057"/>
+            </StackPanel>
+
+            <Button Grid.Column="2" Content="+ Entrada" Margin="0,20,5,0" Height="35" Background="#198754" Foreground="White" FontWeight="Bold" Cursor="Hand" Click="BtnEntrada_Click"/>
+            <Button Grid.Column="3"  Content="- Saída" Margin="5,20,0,0" Height="35" Background="#DC3545" Foreground="White" FontWeight="Bold" Cursor="Hand" Click="BtnSaida_Click"/>
+        </Grid>
+
+ 
+        <DataGrid x:Name="GridMovimentos" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" Background="#2B3035" Foreground="Black" HeadersVisibility="Column" Margin="0,0,0,15">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header ="Hora" Binding="{Binding Hora}" Width="80"/>
+                <DataGridTextColumn  Header="Tipo" Binding ="{Binding Tipo}" Width="90" />
+                <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width ="*"/>
+                 <DataGridTextColumn Header= "Valor" Binding ="{Binding ValorFormatado}" Width="110" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Saldo,fechar,caixa-->
+        <Grid Grid.Row="3">
+            <TextBlock x:Name="LblSaldo" Text="Saldo : R$ 0,00" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment ="Center" />
+            <Button Content="Fechar Caixa" HorizontalAlignment= "Right" Width="210" Height="42" Background="#0D6EFD" Foreground="White" FontWeight="Bold" Cursor="Hand" Click="BtnFecharCaixa_Click"/>
+        </Grid>
+    </Grid>
+</UserControl>

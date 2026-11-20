@@ -1,0 +1,63 @@
+﻿<UserControl x:Class="Trabalho.OS.Views.OrdemServicoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <!-- cabeçalho os -->
+        <StackPanel Margin="5">
+            <TextBlock Text=" Ordem de Serviço" Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+            <TextBlock Text="Tecky Cell Assistência Técnica : 02798837-2300 " Foreground="#ADB5BD" Margin="0,0,0,4"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Margin="0,0,10,10">
+                    <TextBlock Text="Data " Foreground="#ADB5BD" Margin="0,0,0,4"/>
+                    <TextBox x:Name="TxtData" Height="32" Padding="5" Background="#2B3035" Foreground="White" BorderBrush="#495057"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="0,0,0,10">
+                    <TextBlock Text="Nome do Cliente" Foreground="#ADB5BD" Margin="0,0,0,4"/>
+                    <TextBox x:Name="TxtNome" Height="32" Padding="5" Background="#2B3035" Foreground="White" BorderBrush="#495057"/>
+                </StackPanel>
+            </Grid>
+
+            <TextBlock Text="Endereço" Foreground="#ADB5BD" Margin="0,0,0,4"/>
+            <TextBox x:Name="TxtEndereco" Height="32" Padding="5" Margin="0,0,0,10" Background="#2B3035" Foreground="White" BorderBrush="#495057"/>
+            <TextBlock Text="Contato" Foreground="#ADB5BD" Margin="0,0,0,4"/>
+            <TextBox x:Name="TxtContato" Height="32" Padding="5" Margin="0,0,0,10" Background="#2B3035" Foreground="White" BorderBrush="#495057"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Margin="0,0,10,10">
+                    <TextBlock Text="Modelo do Celular" Foreground="#ADB5BD" Margin="0,0,0,4"/>
+                    <TextBox x:Name="TxtModelo" Height="32" Padding="5" Background="#2B3035" Foreground="White" BorderBrush="#495057"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="0,0,0,10">
+                    <TextBlock Text="Nº de Série / IMEI" Foreground="#ADB5BD" Margin="0,0,0,4"/>
+                    <TextBox x:Name="TxtImei" Height="32" Padding="5" Background="#2B3035" Foreground="White" BorderBrush="#495057"/>
+                </StackPanel>
+            </Grid>
+
+            <TextBlock Text="Defeito Relatado" Foreground="#ADB5BD" Margin="0,0,0,4"/>
+            <TextBox x:Name="TxtDefeito" Height="55" TextWrapping="Wrap" AcceptsReturn="True" Padding="5" Margin="0,0,0,10" Background="#2B3035" Foreground="White" BorderBrush="#495057"/>
+
+            <TextBlock Text="Serviço a ser Realizado" Foreground="#ADB5BD" Margin="0,0,0,4"/>
+            <TextBox x:Name="TxtServico" Height="32" TextWrapping="Wrap" AcceptsReturn="True" Padding="5" Margin="0,0,0,10" Background="#2B3035" Foreground="White" BorderBrush="#495057"/>
+            <TextBlock Text="Valor (R$):" Foreground="#ADB5BD" Margin="0,0,0,4"/>
+            <TextBox x:Name="Txtvalor" Height="32" Padding="5" Background="#2B3035" Foreground="White" BorderBrush="#495057"/>
+            <StackPanel Margin="0,0,0,10">
+                <TextBlock Text="Termos e Condições de Garantia:" Foreground="White" FontWeight="Bold" FontSize="13" Margin="0,0,0,5"/>
+                <TextBlock Text="1 - A garantia dos nossos produtos é de 90 dias." Foreground="#ADB5BD" Margin="0,0,0,2"/>
+                <TextBlock Text="2 - A garantia de peças é válida SOMENTE contra defeitos de fabricação." Foreground="#ADB5BD" Margin="0,0,0,2"/>
+                <TextBlock Text="3 - Não cobrimos defeitos ocasionados por mau uso, quedas ou desgaste." Foreground="#ADB5BD" Margin="0,0,0,2"/>
+                <TextBlock Text="4 - Todos os nossos produtos e peças são testados antecipadamente para evitar problemas." Foreground="#ADB5BD" Margin="0,0,0,2"/>
+                <TextBlock Text="5 - Mercadorias não retiradas no prazo de 60 dias, serão vendidas para pagar o custo." Foreground="#ADB5BD" Margin="0,0,0,2"/>
+            </StackPanel>
+
+            <Button Content="Imprimir O.S " Height="42" Background="#198754" Foreground="White" FontWeight="Bold" FontSize="14" Cursor="Hand" Click="BtnImprimir_Click"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
