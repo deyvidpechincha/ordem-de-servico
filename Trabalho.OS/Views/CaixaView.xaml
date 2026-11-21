@@ -9,15 +9,15 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text=" Caixa " Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+        <TextBlock Grid.Row="0" Text="Caixa" Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
 
         <!-- caixa-lançamento -->
-        <Grid Grid.Row ="1" Margin ="0,0,0,15" >
+        <Grid Grid.Row="1" Margin="0,0,0,15">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition  Width="*"/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="100" />
-                <ColumnDefinition Width ="100"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Margin="0,0,8,0">
@@ -31,23 +31,34 @@
             </StackPanel>
 
             <Button Grid.Column="2" Content="+ Entrada" Margin="0,20,5,0" Height="35" Background="#198754" Foreground="White" FontWeight="Bold" Cursor="Hand" Click="BtnEntrada_Click"/>
-            <Button Grid.Column="3"  Content="- Saída" Margin="5,20,0,0" Height="35" Background="#DC3545" Foreground="White" FontWeight="Bold" Cursor="Hand" Click="BtnSaida_Click"/>
+            <Button Grid.Column="3" Content="- Saída" Margin="5,20,0,0" Height="35" Background="#DC3545" Foreground="White" FontWeight="Bold" Cursor="Hand" Click="BtnSaida_Click"/>
         </Grid>
 
- 
-        <DataGrid x:Name="GridMovimentos" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" Background="#2B3035" Foreground="Black" HeadersVisibility="Column" Margin="0,0,0,15">
+        <DataGrid x:Name="GridMovimentos"
+                  Grid.Row="2"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  Background="#212529"
+                  RowBackground="#2B3035"
+                  AlternatingRowBackground="#252A2E"
+                  Foreground="White"
+                  BorderBrush="#495057"
+                  GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="#343A40"
+                  HeadersVisibility="Column"
+                  Margin="0,0,0,15">
             <DataGrid.Columns>
-                <DataGridTextColumn Header ="Hora" Binding="{Binding Hora}" Width="80"/>
-                <DataGridTextColumn  Header="Tipo" Binding ="{Binding Tipo}" Width="90" />
-                <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width ="*"/>
-                 <DataGridTextColumn Header= "Valor" Binding ="{Binding ValorFormatado}" Width="110" />
+                <DataGridTextColumn Header="Hora" Binding="{Binding Hora}" Width="80"/>
+                <DataGridTextColumn Header="Tipo" Binding="{Binding Tipo}" Width="90"/>
+                <DataGridTextColumn Header="Descrição" Binding="{Binding Descricao}" Width="*"/>
+                <DataGridTextColumn Header="Valor" Binding="{Binding ValorFormatado}" Width="110"/>
             </DataGrid.Columns>
         </DataGrid>
 
-        <!-- Saldo,fechar,caixa-->
+        <!-- Saldo, fechar, caixa -->
         <Grid Grid.Row="3">
-            <TextBlock x:Name="LblSaldo" Text="Saldo : R$ 0,00" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment ="Center" />
-            <Button Content="Fechar Caixa" HorizontalAlignment= "Right" Width="210" Height="42" Background="#0D6EFD" Foreground="White" FontWeight="Bold" Cursor="Hand" Click="BtnFecharCaixa_Click"/>
+            <TextBlock x:Name="LblSaldo" Text="Saldo : R$ 0,00" Foreground="White" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+            <Button Content="Fechar Caixa" HorizontalAlignment="Right" Width="210" Height="42" Background="#0D6EFD" Foreground="White" FontWeight="Bold" Cursor="Hand" Click="BtnFecharCaixa_Click"/>
         </Grid>
     </Grid>
 </UserControl>
