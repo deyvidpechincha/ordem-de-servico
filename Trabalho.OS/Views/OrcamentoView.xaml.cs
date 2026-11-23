@@ -13,9 +13,14 @@ namespace Trabalho.OS.Views
     {
         private static readonly CultureInfo CulturaPtBr = new CultureInfo("pt-BR");
 
+        // tamanho de fonte inicial 
+        private const double FonteInicial = 13.0;
+        private const double FonteMinima = 8.0;
+
         public OrcamentoView()
         {
             InitializeComponent();
+            TxtData.Text = DateTime.Now.ToString("dd/MM/yyyy");
         }
 
         private bool TentarObterValores(out decimal peca, out decimal maoObra, out string mensagemErro)
@@ -88,133 +93,198 @@ namespace Trabalho.OS.Views
             decimal total = peca + maoObra;
 
             PrintDialog printDialog = new PrintDialog();
-            if (printDialog.ShowDialog() == true)
+            if (printDialog.ShowDialog() != true)
+                return;
+
+            // A4 retrato a área imprimível se disponível
+            double pageWidth = printDialog.PrintableAreaWidth > 0 ? printDialog.PrintableAreaWidth : 794;
+            double pageHeight = printDialog.PrintableAreaHeight > 0 ? printDialog.PrintableAreaHeight : 1122;
+
+            double fontSizeBase = FonteInicial;
+            FrameworkElement pagina;
+            bool coube;
+
+            // correção altomatica na fonte 
+            while (true)
             {
-                double pageWidth = printDialog.PrintableAreaWidth > 0 ? printDialog.PrintableAreaWidth : 794;
-                double pageHeight = printDialog.PrintableAreaHeight > 0 ? printDialog.PrintableAreaHeight : 1122;
-
-                Thickness padding = new Thickness(24, 14, 24, 14);
-                double larguraUtil = Math.Max(200, pageWidth - padding.Left - padding.Right);
-
-                double fontSizeBase = 10.0;
-                FlowDocument doc = ConstruirDocumentoOrcamento(pageWidth, pageHeight, padding, larguraUtil, fontSizeBase, peca, maoObra, total);
-
-                IDocumentPaginatorSource idpSource = doc;
-                DocumentPaginator paginator = idpSource.DocumentPaginator;
-                paginator.PageSize = new Size(pageWidth, pageHeight);
-                paginator.ComputePageCount();
-
-                while (paginator.PageCount > 1 && fontSizeBase > 7.5)
-                {
-                    fontSizeBase -= 0.5;
-                    doc = ConstruirDocumentoOrcamento(pageWidth, pageHeight, padding, larguraUtil, fontSizeBase, peca, maoObra, total);
-                    idpSource = doc;
-                    paginator = idpSource.DocumentPaginator;
-                    paginator.PageSize = new Size(pageWidth, pageHeight);
-                    paginator.ComputePageCount();
-                }
-
-                string nomeSeguro = SanitizarNomeArquivo(TxtClienteAparelho.Text);
-                printDialog.PrintDocument(paginator, $"Orcamento_{nomeSeguro}");
+                pagina = ConstruirPaginaA4(pageWidth, pageHeight, fontSizeBase, peca, maoObra, total, out coube);
+                if (coube || fontSizeBase <= FonteMinima)
+                    break;
+                fontSizeBase -= 0.5;
             }
+
+            string nomeSeguro = SanitizarNomeArquivo(TxtClienteAparelho.Text);
+            printDialog.PrintVisual(pagina, $"Orcamento_{nomeSeguro}");
         }
 
-        private FlowDocument ConstruirDocumentoOrcamento(
+        private FrameworkElement ConstruirPaginaA4(
             double pageWidth,
             double pageHeight,
-            Thickness padding,
-            double larguraUtil,
             double baseFontSize,
             decimal peca,
             decimal maoObra,
-            decimal total)
+            decimal total,
+            out bool coube)
         {
-            FlowDocument doc = new FlowDocument
+            Grid pagina = new Grid
             {
-                PageWidth = pageWidth,
-                PageHeight = pageHeight,
-                PagePadding = padding,
-                ColumnWidth = larguraUtil,
-                FontFamily = new FontFamily("Segoe UI"),
-                FontSize = baseFontSize
+                Width = pageWidth,
+                Height = pageHeight,
+                Background = Brushes.White
             };
+            pagina.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            pagina.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
-            doc.Blocks.Add(CriarViaOrcamento("VIA DO LOJISTA", baseFontSize, peca, maoObra, total));
+            //  títulos 1 e2
+            StackPanel viaCima = CriarViaOrcamento("VIA 1", baseFontSize, peca, maoObra, total);
+            StackPanel viaBaixo = CriarViaOrcamento("VIA 2", baseFontSize, peca, maoObra, total);
 
-            Paragraph corte = new Paragraph(new Run("- - - - - - - - - - - - - - - - - - - - -  CORTE AQUI  - - - - - - - - - - - - - - - - - - - - -"))
+            viaCima.Margin = new Thickness(30, 16, 30, 16);
+            viaBaixo.Margin = new Thickness(30, 16, 30, 16);
+            viaCima.VerticalAlignment = VerticalAlignment.Top;
+            viaBaixo.VerticalAlignment = VerticalAlignment.Top;
+
+            Grid.SetRow(viaCima, 0);
+            Grid.SetRow(viaBaixo, 1);
+            pagina.Children.Add(viaCima);
+            pagina.Children.Add(viaBaixo);
+
+            // corte no centro  da folha
+            Grid corte = new Grid { VerticalAlignment = VerticalAlignment.Center };
+            Grid.SetRowSpan(corte, 2);
+
+            corte.Children.Add(new System.Windows.Shapes.Line
             {
-                TextAlignment = TextAlignment.Center,
-                Margin = new Thickness(0, 5, 0, 5),
+                X1 = 0,
+                X2 = 1,
+                Stretch = Stretch.Fill,
+                Stroke = Brushes.Gray,
+                StrokeThickness = 1,
+                StrokeDashArray = new DoubleCollection { 4, 4 },
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(10, 0, 10, 0)
+            });
+            corte.Children.Add(new TextBlock
+            {
+                Text = "CORTE AQUI",
+                FontSize = 9,
                 Foreground = Brushes.Gray,
-                FontSize = Math.Max(7.5, baseFontSize - 1.5)
-            };
-            doc.Blocks.Add(corte);
+                Background = Brushes.White,
+                Padding = new Thickness(8, 0, 8, 0),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            });
+            pagina.Children.Add(corte);
 
-            doc.Blocks.Add(CriarViaOrcamento("VIA DO CLIENTE", baseFontSize, peca, maoObra, total));
+            //  cada via na sua metade da folha
+            
+            double alturaMetade = pageHeight / 2.0;
+            Size medida = new Size(pageWidth, double.PositiveInfinity);
 
-            return doc;
+            viaCima.Measure(medida);
+            viaBaixo.Measure(medida);
+            coube = viaCima.DesiredSize.Height <= alturaMetade - 8 &&
+                    viaBaixo.DesiredSize.Height <= alturaMetade - 8;
+
+            pagina.Measure(new Size(pageWidth, pageHeight));
+            pagina.Arrange(new Rect(0, 0, pageWidth, pageHeight));
+            pagina.UpdateLayout();
+
+            return pagina;
         }
 
-        private Section CriarViaOrcamento(string tituloVia, double baseFontSize, decimal peca, decimal maoObra, decimal total)
+        private StackPanel CriarViaOrcamento(string tituloVia, double baseFontSize, decimal peca, decimal maoObra, decimal total)
         {
-            Section sec = new Section
+            StackPanel via = new StackPanel
             {
-                Margin = new Thickness(0)
+                Orientation = Orientation.Vertical
             };
+            TextElement.SetFontFamily(via, new FontFamily("Segoe UI"));
+            TextElement.SetForeground(via, Brushes.Black);
 
-            Paragraph titulo = new Paragraph(new Run($"TECKY CELL (027 98837-2300) — ORÇAMENTO | {tituloVia}"))
+            string data = string.IsNullOrWhiteSpace(TxtData.Text)
+                ? DateTime.Now.ToString("dd/MM/yyyy")
+                : TxtData.Text.Trim();
+
+            // cabeçalho
+            via.Children.Add(new TextBlock
             {
+                Text = $"TECKY CELL (027 98837-2300) — ORÇAMENTO | {tituloVia}",
                 FontSize = baseFontSize + 1.5,
                 FontWeight = FontWeights.Bold,
                 TextAlignment = TextAlignment.Center,
-                Margin = new Thickness(0, 0, 0, 4)
-            };
-            sec.Blocks.Add(titulo);
+                Margin = new Thickness(0, 0, 0, 8)
+            });
 
-            Paragraph dados = new Paragraph
+            // dados
+            TextBlock dados = new TextBlock
             {
-                LineHeight = baseFontSize + 4.0,
-                Margin = new Thickness(0, 0, 0, 4)
+                FontSize = baseFontSize,
+                TextWrapping = TextWrapping.Wrap,
+                LineHeight = baseFontSize + 7.0,
+                Margin = new Thickness(0, 0, 0, 8)
             };
 
             dados.Inlines.Add(new Bold(new Run("Data: ")));
-            dados.Inlines.Add(new Run($"{DateTime.Now:dd/MM/yyyy HH:mm}    "));
+            dados.Inlines.Add(new Run($"{data}    "));
             dados.Inlines.Add(new Bold(new Run("Contato: ")));
-            dados.Inlines.Add(new Run($"{LimitarTexto(TxtContato.Text, 25)}\n"));
+            dados.Inlines.Add(new Run(LimitarTexto(TxtContato.Text, 25)));
+            dados.Inlines.Add(new LineBreak());
 
             dados.Inlines.Add(new Bold(new Run("Cliente / Aparelho: ")));
-            dados.Inlines.Add(new Run($"{LimitarTexto(TxtClienteAparelho.Text, 70)}\n"));
+            dados.Inlines.Add(new Run(LimitarTexto(TxtClienteAparelho.Text, 70)));
+            dados.Inlines.Add(new LineBreak());
 
             dados.Inlines.Add(new Bold(new Run("Descrição: ")));
-            dados.Inlines.Add(new Run($"{LimitarTexto(TxtDescricaoOrc.Text, 160)}\n"));
+            dados.Inlines.Add(new Run(LimitarTexto(TxtDescricaoOrc.Text, 160)));
+            dados.Inlines.Add(new LineBreak());
 
             dados.Inlines.Add(new Bold(new Run("Valor da Peça: ")));
             dados.Inlines.Add(new Run($"{peca.ToString("C2", CulturaPtBr)}    "));
             dados.Inlines.Add(new Bold(new Run("Mão de Obra: ")));
-            dados.Inlines.Add(new Run($"{maoObra.ToString("C2", CulturaPtBr)}"));
+            dados.Inlines.Add(new Run(maoObra.ToString("C2", CulturaPtBr)));
 
-            sec.Blocks.Add(dados);
+            via.Children.Add(dados);
 
-            Paragraph totalBlock = new Paragraph(new Run($"VALOR TOTAL: {total.ToString("C2", CulturaPtBr)}"))
+            // total
+            via.Children.Add(new TextBlock
             {
-                FontSize = baseFontSize + 1.5,
+                Text = $"VALOR TOTAL: {total.ToString("C2", CulturaPtBr)}",
+                FontSize = baseFontSize + 2.0,
                 FontWeight = FontWeights.Bold,
-                Margin = new Thickness(0, 4, 0, 6),
-                TextAlignment = TextAlignment.Center
-            };
-            sec.Blocks.Add(totalBlock);
-
-            Paragraph assinaturas = new Paragraph(
-                new Run("___________________________________                    ___________________________________\n" +
-                        "       Assinatura do Cliente                                          Assinatura do Lojista"))
-            {
-                FontSize = Math.Max(8.0, baseFontSize - 1.0),
                 TextAlignment = TextAlignment.Center,
-                Margin = new Thickness(0, 2, 0, 0)
-            };
-            sec.Blocks.Add(assinaturas);
+                Margin = new Thickness(0, 4, 0, 26)
+            });
 
-            return sec;
+            // assinaturas
+            Grid assinaturas = new Grid { Margin = new Thickness(0, 4, 0, 0) };
+            assinaturas.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            assinaturas.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(40) });
+            assinaturas.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            Border CriarCampoAssinatura(string rotulo) => new Border
+            {
+                BorderBrush = Brushes.Black,
+                BorderThickness = new Thickness(0, 1, 0, 0),
+                Child = new TextBlock
+                {
+                    Text = rotulo,
+                    FontSize = Math.Max(8.0, baseFontSize - 1.0),
+                    TextAlignment = TextAlignment.Center,
+                    Margin = new Thickness(0, 3, 0, 0)
+                }
+            };
+
+            Border assCliente = CriarCampoAssinatura("Assinatura do Cliente");
+            Border assLojista = CriarCampoAssinatura("Assinatura do Lojista");
+            Grid.SetColumn(assCliente, 0);
+            Grid.SetColumn(assLojista, 2);
+            assinaturas.Children.Add(assCliente);
+            assinaturas.Children.Add(assLojista);
+
+            via.Children.Add(assinaturas);
+
+            return via;
         }
 
         private static string LimitarTexto(string texto, int maxCaracteres)
